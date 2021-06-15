@@ -533,7 +533,8 @@ inline bool Apply_Encoder(const ENCODER_DiffState &encoder_diffState, auto &valr
 
 #define TUNE_CASE_SPEED 1
 #define TUNE_CASE_TEMP (TUNE_CASE_SPEED + ENABLED(HAS_HOTEND))
-#define TUNE_CASE_BED  (TUNE_CASE_TEMP + ENABLED(HAS_HEATED_BED))
+#define TUNE_CASE_FLOW (TUNE_CASE_TEMP + ENABLED(HAS_HOTEND))
+#define TUNE_CASE_BED  (TUNE_CASE_FLOW + ENABLED(HAS_HEATED_BED))
 #define TUNE_CASE_FAN  (TUNE_CASE_BED + ENABLED(HAS_FAN))
 #define TUNE_CASE_ZOFF (TUNE_CASE_FAN + ENABLED(HAS_ZOFFSET_ITEM))
 #define TUNE_CASE_TOTAL TUNE_CASE_ZOFF
@@ -1381,6 +1382,25 @@ void HMI_Move_Z() {
       // E_Temp value
       DWIN_Draw_IntValue(true, true, 0, font8x16, Color_White, Select_Color, 3, 216, MBASE(temp_line), HMI_ValueStruct.E_Temp);
     }
+  }
+
+  void HMI_FlowRate() {
+    const uint8_t line_no = select_tune.now + MROWS - index_tune;
+    // const uint8_t line_no = TUNE_CASE_FLOW + MROWS - index_tune;
+    ENCODER_DiffState encoder_diffState = Encoder_ReceiveAnalyze();
+    if (encoder_diffState != ENCODER_DIFF_NO) {
+      if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Flow_Rate)) {
+        checkkey = Tune;
+        EncoderRate.enabled = false;
+        planner.set_flow(0, HMI_ValueStruct.Flow_Rate);
+        DWIN_Draw_IntValue(true, true, 0, font8x16, Color_White, Color_Bg_Black, 3, 216, MBASE(line_no), planner.flow_percentage[0]);
+        return;
+      }
+    }
+    // Flow_Rate limit
+    LIMIT(HMI_ValueStruct.Flow_Rate, 0, 200);
+    // Flow_Rate value
+    DWIN_Draw_IntValue(true, true, 0, font8x16, Color_White, Color_Bg_Black, 3, 216, MBASE(line_no), planner.flow_percentage[0]);
   }
 
 #endif // HAS_HOTEND
@@ -3606,6 +3626,12 @@ void HMI_Tune() {
           DWIN_Draw_IntValue(true, true, 0, font8x16, Color_White, Select_Color, 3, 216, MBASE(TUNE_CASE_TEMP + MROWS - index_tune), HMI_ValueStruct.E_Temp);
           EncoderRate.enabled = true;
           break;
+        case TUNE_CASE_FLOW: // Flow rate
+          checkkey = FlowRate;
+          planner.set_flow(0, HMI_ValueStruct.Flow_Rate);
+          DWIN_Draw_IntValue(true, true, 0, font8x16, Color_White, Select_Color, 3, 216, MBASE(TUNE_CASE_FLOW + MROWS - index_tune), HMI_ValueStruct.Flow_Rate);
+          EncoderRate.enabled = true;
+          break;
       #endif
       #if HAS_HEATED_BED
         case TUNE_CASE_BED: // Bed temp
@@ -4078,6 +4104,7 @@ void DWIN_HandleScreen() {
     #if HAS_HOTEND
       case Extruder:      HMI_Move_E(); break;
       case ETemp:         HMI_ETemp(); break;
+      case FlowRate:      HMI_FlowRate(); break;
     #endif
     #if EITHER(HAS_BED_PROBE, BABYSTEPPING)
       case Homeoffset:    HMI_Zoffset(); break;

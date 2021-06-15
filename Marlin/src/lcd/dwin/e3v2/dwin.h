@@ -88,6 +88,7 @@ enum processID : uint8_t {
   #if HAS_HOTEND
     Extruder,
     ETemp,
+    FlowRate,
   #endif
   Homeoffset,
   #if HAS_HEATED_BED
@@ -257,6 +258,7 @@ extern millis_t dwin_heat_time;
 typedef struct {
   #if ENABLED(HAS_HOTEND)
     celsius_t E_Temp = 0;
+    int16_t Flow_Rate = 100;
   #endif
   #if ENABLED(HAS_HEATED_BED)
     celsius_t Bed_Temp = 0;
