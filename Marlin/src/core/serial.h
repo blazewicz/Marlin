@@ -90,7 +90,7 @@ extern uint8_t marlin_debug_flags;
   #define SERIAL_ASSERT(P)    if(multiSerial.portMask!=(P)){ debugger(); }
   // If we have a catchall, use that directly
   #ifdef SERIAL_CATCHALL
-    #define _SERIAL_LEAF_2 SERIAL_CATCHALL
+    #define _SERIAL_LEAF_2 MSERIAL(SERIAL_CATCHALL)
   #elif HAS_ETHERNET
     typedef ConditionalSerial<decltype(MYSERIAL2)> SerialLeafT2;  // We need to create an instance here
     extern SerialLeafT2 msSerial2;
