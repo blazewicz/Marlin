@@ -1276,6 +1276,10 @@ private:
     static void M710_report(const bool forReplay=true);
   #endif
 
+  #if ENABLED(FAST_PWM_FAN)
+    static void M9891();
+  #endif
+
   static void T(const int8_t tool_index);
 
 };

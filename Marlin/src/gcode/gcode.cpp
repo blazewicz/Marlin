@@ -1103,6 +1103,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 3426: M3426(); break;                                // M3426: Read MCP3426 ADC (over i2c)
       #endif
 
+      #if ENABLED(FAST_PWM_FAN)
+        case 9891: M9891(); break;
+      #endif
+
       default: parser.unknown_command_warning(); break;
     }
     break;
