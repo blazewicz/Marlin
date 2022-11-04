@@ -720,7 +720,7 @@ void JyersDWIN::drawPrintFilename(const bool reset/*=false*/) {
 }
 
 void JyersDWIN::drawPrintProgressBar() {
-  uint8_t printpercent = sdprint ? card.percentDone() : (ui._get_progress() / 100);
+  uint8_t printpercent = ui.get_progress_percent();
   dwinIconShow(ICON, ICON_Bar, 15, 93);
   dwinDrawRectangle(1, COLOR_BARFILL, 16 + printpercent * 240 / 100, 93, 256, 113);
   dwinDrawIntValue(true, true, 0, DWIN_FONT_MENU, getColor(eeprom_settings.progress_percent, COLOR_PERCENT), COLOR_BG_BLACK, 3, 109, 133, printpercent);
