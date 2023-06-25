@@ -180,7 +180,7 @@ void *valuepointer = nullptr;
 float tempvalue;
 float valuemin;
 float valuemax;
-uint8_t valueunit;
+float valueunit;
 uint8_t valuetype;
 
 char statusmsg[64];
@@ -460,7 +460,7 @@ void JyersDWIN::clearScreen(const uint8_t e/*=3*/) {
   if (e == 4) dwinDrawRectangle(1, COLOR_BG_BLACK, 0, 31, DWIN_WIDTH, DWIN_HEIGHT); // Clear Popup Area
 }
 
-void JyersDWIN::drawFloat(const_float_t value, const uint8_t row, const bool selected/*=false*/, const uint8_t minunit/*=10*/) {
+void JyersDWIN::drawFloat(const_float_t value, const uint8_t row, const bool selected/*=false*/, const float minunit/*=10*/) {
   const uint8_t digits = (uint8_t)floor(log10(abs(value))) + log10(minunit) + (minunit > 1);
   const uint16_t bColor = selected ? COLOR_SELECT : COLOR_BG_BLACK;
   const uint16_t xpos = 240 - (digits * 8);
@@ -2333,7 +2333,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       #define MOTION_SPEED (MOTION_HOMEOFFSETS + 1)
       #define MOTION_ACCEL (MOTION_SPEED + 1)
       #define MOTION_JERK (MOTION_ACCEL + ENABLED(HAS_CLASSIC_JERK))
-      #define MOTION_STEPS (MOTION_JERK + 1)
+      #define MOTION_JUNCTION_DEVIATION (MOTION_JERK + ENABLED(HAS_JUNCTION_DEVIATION))
+      #define MOTION_STEPS (MOTION_JUNCTION_DEVIATION + 1)
       #define MOTION_FLOW (MOTION_STEPS + ENABLED(HAS_HOTEND))
       #define MOTION_TOTAL MOTION_FLOW
 
@@ -2376,6 +2377,20 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           else
             drawMenu(ID_Steps);
           break;
+        #if HAS_JUNCTION_DEVIATION
+          #define MIN_JDEV 0.001
+          #define MAX_JDEV 0.300
+          #define UNIT_JDEV 1000
+
+          case MOTION_JUNCTION_DEVIATION:
+            if (draw) {
+              drawMenuItem(row, ICON_MaxJerk, F("J. Deviation"));
+              drawFloat(planner.junction_deviation_mm, row, false, UNIT_JDEV);
+            }
+            else
+              modifyValue(planner.junction_deviation_mm, MIN_JDEV, MAX_JDEV, UNIT_JDEV, TERN(HAS_LINEAR_E_JERK, planner.recalculate_max_e_jerk, nullptr));
+            break;
+        #endif
         #if HAS_HOTEND
           case MOTION_FLOW:
             if (draw) {

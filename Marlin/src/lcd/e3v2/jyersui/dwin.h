@@ -203,7 +203,7 @@ public:
   static constexpr const char * const preheat_modes[3] = { "Both", "Hotend", "Bed" };
 
   static void clearScreen(const uint8_t e=3);
-  static void drawFloat(const_float_t value, const uint8_t row, const bool selected=false, const uint8_t minunit=10);
+  static void drawFloat(const_float_t value, const uint8_t row, const bool selected=false, const float minunit=10);
   static void drawOption(const uint8_t value, const char * const * options, const uint8_t row, const bool selected=false, const bool color=false);
   static uint16_t getColor(const uint8_t color, const uint16_t original, const bool light=false);
   static void drawCheckbox(const uint8_t row, const bool value);
