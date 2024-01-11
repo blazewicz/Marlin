@@ -23,7 +23,6 @@ extern "C" {
 #endif
 
 #if defined(GD32F10x)
-  #define RCC_PLL_MUL6_5 (13UL << RCC_CFGR_PLLMULL_Pos)
   #define RCC_PLL_MUL17  (16UL << RCC_CFGR_PLLMULL_Pos)
   #define RCC_PLL_MUL18  (17UL << RCC_CFGR_PLLMULL_Pos)
   #define RCC_PLL_MUL19  (18UL << RCC_CFGR_PLLMULL_Pos)
